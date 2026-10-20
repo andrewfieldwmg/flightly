@@ -12,6 +12,8 @@ import { SearchForm } from "./search-form";
 import { SearchStatusPanel } from "./search-status-panel";
 import { TripSummary } from "./trip-summary";
 import { calendarPrefetchKey, prefetchSearchCalendar } from "@/lib/search/calendar-prefetch";
+import { PreferenceTrainer } from "./preference-trainer";
+import { usePreferenceModel } from "@/hooks/use-preference-model";
 
 const emptyDirectionResults = {
   baseline: null,
@@ -33,6 +35,7 @@ export function SearchExperience() {
   const [startError, setStartError] = useState<string | null>(null);
   const [cachedMinutes, setCachedMinutes] = useState<number | null>(null);
   const [excludeBaggage, setExcludeBaggage] = useState(true);
+  const { profile: preferenceProfile, choose: recordPreference, reset: resetPreferences } = usePreferenceModel();
   const savedTrips = useRef(new Set<string>());
   const searchClickedAt = useRef<number | null>(null);
   const firstRenderedResultRecorded = useRef(false);
@@ -92,6 +95,7 @@ export function SearchExperience() {
 
   const outboundOptions = uniqueOptions(state.snapshot?.outbound ?? null);
   const returnOptions = uniqueOptions(state.snapshot?.return ?? null);
+  const preferenceOptions = outboundOptions.length >= 2 ? outboundOptions : returnOptions;
   const outbound = selected(outboundOptions, state.selectedOutboundId);
   const inbound = selected(returnOptions, state.selectedReturnId);
   const isTerminal = state.snapshot ? terminal.has(state.snapshot.status) : false;
@@ -203,6 +207,12 @@ export function SearchExperience() {
       )}
       {(state.snapshot || state.request) && (
         <>
+          {state.snapshot && preferenceOptions.length > 0 && <PreferenceTrainer
+            options={preferenceOptions}
+            profile={preferenceProfile}
+            onChoose={recordPreference}
+            onReset={resetPreferences}
+          />}
           {state.snapshot && <TripSummary
             outbound={outbound}
             inbound={state.snapshot.return ? inbound : null}
