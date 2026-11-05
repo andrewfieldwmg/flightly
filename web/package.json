@@ -8,7 +8,8 @@
     "build": "next build",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
-    "test": "vitest run"
+    "test": "vitest run",
+    "eval:preferences": "node scripts/evaluate-preferences.mjs"
   },
   "dependencies": {
     "next": "16.3.2",

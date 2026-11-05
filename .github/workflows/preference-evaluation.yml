@@ -1,0 +1,33 @@
+name: Preference model evaluation
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  evaluate-preferences:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v6
+        with:
+          persist-credentials: false
+      - uses: actions/setup-node@v6
+        with:
+          node-version: "24.19.0"
+          package-manager-cache: false
+      - name: Evaluate held-out preference predictions
+        working-directory: web
+        run: npm run eval:preferences -- preference-evaluation.json
+      - name: Publish evaluation report
+        if: ${{ !cancelled() }}
+        uses: actions/upload-artifact@v7
+        with:
+          name: preference-evaluation-${{ github.sha }}
+          path: web/preference-evaluation.json
+          if-no-files-found: error

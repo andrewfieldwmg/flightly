@@ -112,6 +112,35 @@ capabilities: Ryanair and easyJet are `EXACT_FLIGHT_HANDOFF`; Wizz Air remains
 exact-flight preservation was not independently verified. SearchAPI/airline price
 differences remain visible as repricing deltas and are never silently reconciled.
 
+## Preference model MLOps
+
+Run `npm run eval:preferences -- preference-evaluation.json` from `web/`
+with Node.js 24 to evaluate the same preference model used by the browser.
+The benchmark uses fixed synthetic data and three traveller profiles. Each
+profile answers 36 actively selected comparisons, then the model predicts
+pairwise preferences on a separate set of itineraries. The synthetic labels
+are computed from raw itinerary attributes independently of the model.
+
+GitHub Actions runs this on pull requests and pushes to `main`. The job
+fails if any profile falls below its regression floor or cannot complete
+the training budget. The JSON report records the commit in CI, the benchmark
+and browser profile versions, per-profile results, and a cheapest-first
+baseline. Reports are available as workflow artifacts, including when the
+quality threshold fails. Bump the benchmark version when changing fixtures,
+labels or thresholds so results remain comparable within each version.
+
+| Synthetic traveller | Model agreement (v1 reference run) | Cheapest-first agreement | CI floor |
+| --- | ---: | ---: | ---: |
+| Fare-first | 52.9% | 96.7% | 50% |
+| Time-first | 86.3% | 47.7% | 80% |
+| Convenience-first | 92.2% | 59.5% | 85% |
+
+The floors flag regressions against the current model. Cheapest-first
+sorting is the stronger baseline for the fare-first traveller.
+
+This is a synthetic regression benchmark for the preference model. It uses
+no passenger data or flight API calls and does not measure real-user accuracy.
+
 ## Vercel deployment
 
 The repository deploys as one Vercel Services project. Set the Vercel project
