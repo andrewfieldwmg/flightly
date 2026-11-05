@@ -1,4 +1,4 @@
-import { writeFileSync } from "node:fs";
+import { appendFileSync, writeFileSync } from "node:fs";
 import {
   choosePreferencePair,
   emptyPreferenceProfile,
@@ -120,4 +120,32 @@ const report = {
 const json = JSON.stringify(report, null, 2) + "\n";
 if (process.argv[2]) writeFileSync(process.argv[2], json);
 process.stdout.write(json);
+
+if (process.env.GITHUB_STEP_SUMMARY) {
+  const percent = (value) => value === null ? "Unavailable" : `${(value * 100).toFixed(1)}%`;
+  const rows = results.map((result) => [
+    result.persona,
+    result.trainingComparisons,
+    result.labelledPairs,
+    percent(result.pairwiseAccuracy),
+    percent(result.cheapestFirstAccuracy),
+    percent(result.minimumAccuracy),
+    result.passed ? "Pass" : "Fail",
+  ].join(" | "));
+
+  const summary = [
+    "## Flightly preference model evaluation",
+    "",
+    `Benchmark v${report.benchmarkVersion} · Browser profile v${report.modelProfileVersion} · **${report.passed ? "Passed" : "Failed"}**`,
+    "",
+    "| Traveller profile | Training choices | Held-out pairs | Model agreement | Cheapest-first baseline | Regression floor | Result |",
+    "| --- | ---: | ---: | ---: | ---: | ---: | --- |",
+    ...rows.map((row) => `| ${row} |`),
+    "",
+    "This benchmark uses synthetic traveller choices. Download the evaluation artifact for the commit, dataset seeds and full results.",
+    "",
+  ];
+  appendFileSync(process.env.GITHUB_STEP_SUMMARY, summary.join("\n"));
+}
+
 if (!report.passed) process.exitCode = 1;

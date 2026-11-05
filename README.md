@@ -125,8 +125,10 @@ GitHub Actions runs this on pull requests and pushes to `main`. The job
 fails if any profile falls below its regression floor or cannot complete
 the training budget. The JSON report records the commit in CI, the benchmark
 and browser profile versions, per-profile results, and a cheapest-first
-baseline. Reports are available as workflow artifacts, including when the
-quality threshold fails. Bump the benchmark version when changing fixtures,
+baseline. Open the **Preference model evaluation** workflow in GitHub Actions
+and select a run to see the results table on its **Summary** page. Download the
+JSON from **Artifacts** for the full report, including when the quality
+threshold fails. Bump the benchmark version when changing fixtures,
 labels or thresholds so results remain comparable within each version.
 
 | Synthetic traveller | Model agreement (v1 reference run) | Cheapest-first agreement | CI floor |
