@@ -1,0 +1,97 @@
+{
+  "schemaVersion": 1,
+  "name": "FlightlyPreferenceRanker",
+  "modelProfileVersion": 1,
+  "featureKeys": [
+    "affordability",
+    "journey_efficiency",
+    "nonstop",
+    "departure_convenience",
+    "arrival_convenience",
+    "transfer_comfort",
+    "ticket_protection",
+    "baggage_confidence"
+  ],
+  "sourceSha256": "861eacd53d6be2e8026c659cc034051440fdebf9f6948329353e0861ddc9e18b",
+  "defaultPersona": "convenience-first",
+  "dataset": "synthetic",
+  "weights": {
+    "affordability": 1.6095954623107165,
+    "journey_efficiency": -0.24505805154509663,
+    "nonstop": 0.19113251098404793,
+    "departure_convenience": 1.298773875688348,
+    "arrival_convenience": 0.24791662233359307,
+    "transfer_comfort": 0.65908618221689,
+    "ticket_protection": 3.3709874591738345,
+    "baggage_confidence": 0
+  },
+  "trainingBudget": 36,
+  "benchmarkVersion": 1,
+  "validationPassed": true,
+  "sourceCommit": "e9596d27e525fa5cd6e0073f73ee72eb2ea170f3",
+  "predictionExamples": [
+    {
+      "features": {
+        "affordability": 0.3164556962025316,
+        "journey_efficiency": 0.5797101449275363,
+        "nonstop": 1,
+        "departure_convenience": 0.5,
+        "arrival_convenience": 1,
+        "transfer_comfort": 0,
+        "ticket_protection": 1,
+        "baggage_confidence": 1
+      },
+      "score": 4.826726544388755
+    },
+    {
+      "features": {
+        "affordability": 0.45620437956204374,
+        "journey_efficiency": 0.3443328550932568,
+        "nonstop": 0,
+        "departure_convenience": 0.30000000000000004,
+        "arrival_convenience": 1,
+        "transfer_comfort": 1,
+        "ticket_protection": 0,
+        "baggage_confidence": 1
+      },
+      "score": 1.9465579279342151
+    },
+    {
+      "features": {
+        "affordability": 0.397456279809221,
+        "journey_efficiency": 0.364741641337386,
+        "nonstop": 0,
+        "departure_convenience": 0.8,
+        "arrival_convenience": 0.8388888888888889,
+        "transfer_comfort": 1,
+        "ticket_protection": 1,
+        "baggage_confidence": 1
+      },
+      "score": 5.827428190292237
+    }
+  ],
+  "evaluation": [
+    {
+      "persona": "fare-first",
+      "pairwiseAccuracy": 0.5294117647058824,
+      "minimumAccuracy": 0.5,
+      "passed": true
+    },
+    {
+      "persona": "time-first",
+      "pairwiseAccuracy": 0.8627450980392157,
+      "minimumAccuracy": 0.8,
+      "passed": true
+    },
+    {
+      "persona": "convenience-first",
+      "pairwiseAccuracy": 0.9215686274509803,
+      "minimumAccuracy": 0.85,
+      "passed": true
+    }
+  ],
+  "version": "2",
+  "modelId": "m-88e08c1dd068495c859bfb3feb800755",
+  "runId": "73d123d5a914447a806ff5578ebc2f8c",
+  "registryUrl": "https://desktop-u6i86iq.tail53b14b.ts.net/#/models/FlightlyPreferenceRanker/versions/2"
+}

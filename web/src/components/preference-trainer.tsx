@@ -8,6 +8,7 @@ import {
 } from "@/lib/search/preference-model";
 import { money } from "./price-display";
 import { duration } from "./result-card";
+import release from "@/lib/search/model-release.json";
 
 function clock(value: string): string {
   return value.match(/T(\d{2}:\d{2})/)?.[1] ?? "—";
@@ -45,7 +46,11 @@ export function PreferenceTrainer({
       <span>{profile.comparisons
         ? `Learned from ${profile.comparisons} choice${profile.comparisons === 1 ? "" : "s"}. ${priorities.length ? `Strongest signals: ${priorities.map((item) => `${item.weight >= 0 ? "more " : "less "}${item.label}`).join(", ")}.` : "Keep training to reveal stronger signals."}`
         : "Teach Flightly your trade-offs. Each answer updates a pairwise ranking model."}</span>
-      <small>Stored only in this browser. Feasibility and connection-safety rules always remain hard constraints.</small>
+      <small>
+        <a href={release.registryUrl} target="_blank" rel="noreferrer">Ranking model v{release.version}</a>
+        {" · "}{profile.comparisons ? "Personal learning stored in this browser." : "Starting from a synthetic convenience-first profile."}
+        {" "}Choose For you to rank results. Connection-safety rules remain hard constraints.
+      </small>
     </div>
     {pair && <div className="preference-choices">
       <Choice option={pair.left} onChoose={() => onChoose(pair.left, pair.right)} />

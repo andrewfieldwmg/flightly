@@ -24,6 +24,9 @@ jobs:
       - name: Evaluate held-out preference predictions
         working-directory: web
         run: npm run eval:preferences -- preference-evaluation.json
+      - name: Verify deployed model contract
+        working-directory: web
+        run: npm run check:model
       - name: Publish evaluation report
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v7

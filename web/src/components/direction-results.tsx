@@ -6,6 +6,7 @@ import { money } from "./price-display";
 import { duration } from "./result-card";
 import { comparisonPeriod, historyAccessibleLabel, historySignal, historyTooltip, priceHistoryState } from "@/lib/search/price-history";
 import { PriceSparkline } from "./price-sparkline";
+import { preferenceScore, type PreferenceProfile } from "@/lib/search/preference-model";
 
 export type SortKey = "saving" | "price" | "departure" | "arrival" | "transfer" | "journey" | "extra";
 const RESULTS_PER_PAGE = 15;
@@ -102,6 +103,7 @@ export function DirectionResults({
   selfTransferEnabled,
   connectionProfile,
   date,
+  preferenceProfile,
 }: {
   title: string;
   results: Results;
@@ -111,8 +113,9 @@ export function DirectionResults({
   connectionProfile: ConnectionProfile;
   selfTransferEnabled: boolean;
   date: string;
+  preferenceProfile?: PreferenceProfile;
 }) {
-  const [sort, setSort] = useState<SortKey | null>(null);
+  const [sort, setSort] = useState<SortKey | "preference" | null>(null);
   const [descending, setDescending] = useState(false);
   const [minimumSaving, setMinimumSaving] = useState(0);
   const [customSaving, setCustomSaving] = useState(false);
@@ -126,8 +129,12 @@ export function DirectionResults({
   }, [results, selfTransferEnabled]);
   const options = useMemo(() => {
     const filtered = selfTransferEnabled ? filterByMinimumSaving(displayOptions, minimumSaving, selectedId) : displayOptions;
+    if (sort === "preference") {
+      if (!preferenceProfile) return filtered;
+      return [...filtered].sort((a, b) => preferenceScore(b, preferenceProfile.weights) - preferenceScore(a, preferenceProfile.weights));
+    }
     return sort ? sortOptions(filtered, sort, descending) : filtered;
-  }, [displayOptions, sort, descending, selfTransferEnabled, minimumSaving, selectedId]);
+  }, [displayOptions, sort, descending, selfTransferEnabled, minimumSaving, selectedId, preferenceProfile]);
   const pageCount = Math.max(1, Math.ceil(options.length / RESULTS_PER_PAGE));
   const currentPage = Math.min(page, pageCount);
   const pageOptions = options.slice((currentPage - 1) * RESULTS_PER_PAGE, currentPage * RESULTS_PER_PAGE);
@@ -148,6 +155,12 @@ export function DirectionResults({
       <div className="results-heading">
         <div><h2>{title}</h2><div className="direction-date">{longSearchDate(date)}</div></div>
         <div className="compromise-controls">
+          {preferenceProfile && <button
+            type="button"
+            className={`personalized-sort ${sort === "preference" ? "active" : ""}`}
+            aria-pressed={sort === "preference"}
+            onClick={() => { setSort("preference"); setPage(1); }}
+          >For you</button>}
           {selfTransferEnabled && <span className="active-connection-profile">Connection profile: {connectionProfile.toLowerCase()}</span>}
           {selfTransferEnabled && <label className="minimum-saving">Minimum saving <select aria-label={`${title} minimum saving`} value={customSaving ? "custom" : minimumSaving} onChange={(event) => { setPage(1); if (event.target.value === "custom") setCustomSaving(true); else { setCustomSaving(false); setMinimumSaving(Number(event.target.value)); } }}><option value="0">All connections</option><option value="50">£50</option><option value="100">£100</option><option value="200">£200</option><option value="custom">custom</option></select>{customSaving && <input aria-label={`${title} custom minimum saving`} type="number" min="0" value={minimumSaving} onChange={(event) => { setMinimumSaving(Number(event.target.value)); setPage(1); }} />}</label>}
           <span>{options.length} shown</span>

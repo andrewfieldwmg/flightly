@@ -5,11 +5,12 @@
   "private": true,
   "scripts": {
     "dev": "next dev",
-    "build": "next build",
+    "build": "node scripts/check-model-release.mjs && next build",
     "lint": "eslint .",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "eval:preferences": "node scripts/evaluate-preferences.mjs"
+    "eval:preferences": "node scripts/evaluate-preferences.mjs",
+    "check:model": "node scripts/check-model-release.mjs"
   },
   "dependencies": {
     "next": "16.3.2",

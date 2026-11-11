@@ -143,6 +143,56 @@ sorting is the stronger baseline for the fare-first traveller.
 This is a synthetic regression benchmark for the preference model. It uses
 no passenger data or flight API calls and does not measure real-user accuracy.
 
+### Explore experiments in MLflow
+
+From the repo root, start the local dashboard in one terminal and record
+three runs in another. The launcher installs MLflow in an isolated script
+environment and saves experiments under the ignored `work/flightly-mlflow/`
+directory.
+
+```sh
+uv run --script scripts/flightly_mlflow.py serve
+uv run --script scripts/flightly_mlflow.py run 12 36 72
+```
+
+Open the **Compare runs** link printed by the second command. In the
+**Flightly preference model** experiment, select two or more runs and click **Compare**
+to see the effect of training budget on each traveller profile. In a single
+run, open **Artifacts → preference-evaluation.json** for the exact dataset
+seeds, regression floors and learned weights. Agreement metrics are fractions
+between 0 and 1. A run tagged **below floor** still records its scores so you
+can inspect weak experiments. The 36-choice run matches the CI budget.
+
+### Registry to application
+
+The experiment launcher packages a portable MLflow model for each run and
+registers it as **FlightlyPreferenceRanker**. Its artifacts contain the
+learned convenience-first weights, the evaluation report and prediction
+examples, and the exact TypeScript feature/scoring source. The Python
+package scores the same bounded feature vectors as the browser, with
+prediction parity checked before the version is marked validated.
+
+Select a validated registry version for the next application deployment:
+
+```sh
+uv run --script scripts/flightly_mlflow.py publish 2
+```
+
+This downloads the registered package, checks its predictions and source
+fingerprint, exports its release manifest into the frontend, and points the
+registry's **champion** alias at that version. Commit the manifest and deploy
+the application to serve that pinned release. The frontend build and CI both
+verify the scorer fingerprint, feature schema, weights and regression floors.
+Changing a registry alias takes effect in the application after another
+publish and deployment. The browser performs inference locally from the
+exported model.
+
+The **For you** button ranks the already feasible search options using the
+released weights. A/B choices update those weights locally. Existing learned
+profiles are preserved, while new and reset profiles use the registry prior.
+The trainer links to the exact registry version. The public
+`/ranking-model` endpoint identifies the deployed model release.
+
 ## Vercel deployment
 
 The repository deploys as one Vercel Services project. Set the Vercel project

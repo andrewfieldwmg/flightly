@@ -236,6 +236,7 @@ export function SearchExperience() {
             connectionProfile={state.request?.connection_profile ?? "CONSERVATIVE"}
             selfTransferEnabled={outboundTransfers}
             date={state.request?.outbound_date ?? ""}
+            preferenceProfile={preferenceProfile}
           />
           {state.request?.return_date && (
             <DirectionResults
@@ -247,6 +248,7 @@ export function SearchExperience() {
               connectionProfile={state.request?.connection_profile ?? "CONSERVATIVE"}
               selfTransferEnabled={returnTransfers}
               date={state.request.return_date}
+              preferenceProfile={preferenceProfile}
             />
           )}
         </>

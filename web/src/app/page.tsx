@@ -1,5 +1,6 @@
 import { SearchExperience } from "@/components/search-experience";
 import { ProviderUsageIndicator } from "@/components/provider-usage";
+import release from "@/lib/search/model-release.json";
 
 export default function Home() {
   return (
@@ -15,6 +16,7 @@ export default function Home() {
       <footer>
         Base fares and ancillary estimates can change. Separate tickets are not protected
         connections.
+        {" "}<a href={release.registryUrl} target="_blank" rel="noreferrer">Ranking model v{release.version}</a>
       </footer>
     </main>
   );

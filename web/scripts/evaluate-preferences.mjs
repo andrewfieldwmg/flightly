@@ -1,15 +1,26 @@
-import { appendFileSync, writeFileSync } from "node:fs";
+import { appendFileSync, readFileSync, writeFileSync } from "node:fs";
+import { createHash } from "node:crypto";
+import { parseArgs } from "node:util";
 import {
   choosePreferencePair,
   emptyPreferenceProfile,
   learnPreference,
   PREFERENCE_MODEL_VERSION,
+  preferenceFeatureKeys,
+  preferenceFeatures,
   preferenceScore,
 } from "../src/lib/search/preference-model.ts";
 import { option } from "../src/test/fixtures.ts";
 
 const benchmarkVersion = 1;
-const trainingBudget = 36;
+const { values, positionals } = parseArgs({
+  allowPositionals: true,
+  options: { "training-budget": { type: "string", default: "36" } },
+});
+const trainingBudget = Number(values["training-budget"]);
+if (!Number.isInteger(trainingBudget) || trainingBudget < 1 || trainingBudget > 120 || positionals.length > 1) {
+  throw new Error("Usage: npm run eval:preferences -- [report.json] [--training-budget 1-120]");
+}
 const optionsPerSplit = 18;
 const seeds = { training: 5281, evaluation: 9137 };
 
@@ -98,6 +109,11 @@ function benchmarkPersona(name, { labelScore, minimumAccuracy }) {
     pairwiseAccuracy: accuracy,
     cheapestFirstAccuracy: labelledPairs ? cheapestCorrect / labelledPairs : null,
     minimumAccuracy,
+    learnedWeights: profile.weights,
+    predictionExamples: evaluation.slice(0, 3).map((flight, index) => ({
+      features: preferenceFeatures(flight),
+      score: scores[index],
+    })),
     passed: profile.comparisons === trainingBudget
       && scores.every(Number.isFinite)
       && accuracy !== null && accuracy >= minimumAccuracy,
@@ -108,6 +124,10 @@ const results = Object.entries(personas).map(([name, persona]) => benchmarkPerso
 const report = {
   benchmarkVersion,
   modelProfileVersion: PREFERENCE_MODEL_VERSION,
+  featureKeys: preferenceFeatureKeys,
+  sourceSha256: createHash("sha256").update(
+    readFileSync(new URL("../src/lib/search/preference-model.ts", import.meta.url), "utf8").replaceAll("\r\n", "\n"),
+  ).digest("hex"),
   commit: process.env.GITHUB_SHA ?? null,
   dataset: "synthetic",
   seeds,
@@ -118,7 +138,7 @@ const report = {
 };
 
 const json = JSON.stringify(report, null, 2) + "\n";
-if (process.argv[2]) writeFileSync(process.argv[2], json);
+if (positionals[0]) writeFileSync(positionals[0], json);
 process.stdout.write(json);
 
 if (process.env.GITHUB_STEP_SUMMARY) {
