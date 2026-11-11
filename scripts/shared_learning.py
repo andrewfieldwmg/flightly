@@ -206,8 +206,15 @@ def lab(human_input=None):
                 "mlflow.source.git.commit": subprocess.check_output(
                     ["git", "rev-parse", "HEAD"], cwd=ROOT, text=True
                 ).strip(),
+                "source_tree": "dirty"
+                if subprocess.check_output(
+                    ["git", "status", "--porcelain"], cwd=ROOT, text=True
+                ).strip()
+                else "clean",
             }
         )
+        mlflow.log_artifact(str(report_path), "reproducibility")
+        mlflow.log_artifacts(str(ROOT / "web/scripts"), "evaluation-source")
         mlflow.log_params(
             {
                 "choices": len(report["records"]),
@@ -321,9 +328,13 @@ def lab(human_input=None):
                         "scenario": "demonstrate feature validation failure",
                     }
                 )
-                raise ValueError(
-                    "Injected test: affordability must be a finite number in [0,1]"
-                )
+                invalid_frame = pd.DataFrame(
+                    [report["predictionExamples"][0]["features"]]
+                ).astype(float)
+                invalid_frame["affordability"] = float("nan")
+                # Exercise the packaged model's actual validation guard.
+                mlflow.pyfunc.load_model(info.model_uri).predict(invalid_frame)
+                raise AssertionError("The packaged ranker accepted invalid features")
         except ValueError:
             trace_id = mlflow.get_last_active_trace_id()
             mlflow.log_dict(
