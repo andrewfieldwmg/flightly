@@ -145,6 +145,9 @@ no passenger data or flight API calls and does not measure real-user accuracy.
 
 ### Explore experiments in MLflow
 
+For shared feedback, realistic multi-user simulation, native evaluation datasets,
+traces and a hands-on GUI walkthrough, see [the shared-learning lab](docs/shared-learning-lab.md).
+
 From the repo root, start the local dashboard in one terminal and record
 three runs in another. The launcher installs MLflow in an isolated script
 environment and saves experiments under the ignored `work/flightly-mlflow/`

@@ -3,6 +3,7 @@ from logging.config import fileConfig
 from alembic import context
 from sqlalchemy import engine_from_config, pool
 
+from flight_price_lab.storage import preference_feedback  # noqa: F401
 from flight_price_lab.storage.database import Base, configured_database_url
 
 config = context.config
@@ -28,6 +29,11 @@ def run_migrations_offline() -> None:
 
 
 def run_migrations_online() -> None:
+    if connection := config.attributes.get("connection"):
+        context.configure(connection=connection, target_metadata=target_metadata)
+        with context.begin_transaction():
+            context.run_migrations()
+        return
     connectable = engine_from_config(
         config.get_section(config.config_ini_section, {}),
         prefix="sqlalchemy.",

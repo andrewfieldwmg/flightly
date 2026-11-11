@@ -489,7 +489,7 @@ def test_passenger_composition_and_checked_bags_are_preserved() -> None:
 
 
 def test_api_routes_are_registered() -> None:
-    paths = {route.path for route in create_app(MockProvider()).routes}
+    paths = set(create_app(MockProvider()).openapi()["paths"])
     assert {
         "/api/search",
         "/api/search/stream",

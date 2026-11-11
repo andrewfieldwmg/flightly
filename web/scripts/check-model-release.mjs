@@ -6,7 +6,12 @@ import { preferenceFeatureKeys, PREFERENCE_MODEL_VERSION } from "../src/lib/sear
 const release = JSON.parse(readFileSync(new URL("../src/lib/search/model-release.json", import.meta.url), "utf8"));
 const source = readFileSync(new URL("../src/lib/search/preference-model.ts", import.meta.url), "utf8").replaceAll("\r\n", "\n");
 assert.equal(release.schemaVersion, 1);
-assert.equal(release.name, "FlightlyPreferenceRanker");
+assert.ok(["FlightlyPreferenceRanker", "FlightlySharedPreferenceRanker"].includes(release.name));
+if (release.name === "FlightlySharedPreferenceRanker") {
+  assert.equal(release.origin, "human");
+  assert.equal(release.deploymentEligible, true);
+  assert.equal(release.dataset, "human");
+}
 assert.match(release.version, /^\d+$/);
 assert.equal(release.validationPassed, true);
 assert.equal(release.modelProfileVersion, PREFERENCE_MODEL_VERSION);

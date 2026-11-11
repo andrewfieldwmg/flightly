@@ -27,10 +27,15 @@ jobs:
       - name: Verify deployed model contract
         working-directory: web
         run: npm run check:model
+      - name: Exercise shared learning on disjoint synthetic travellers
+        working-directory: web
+        run: node scripts/shared-learning.mjs --output shared-learning.json
       - name: Publish evaluation report
         if: ${{ !cancelled() }}
         uses: actions/upload-artifact@v7
         with:
           name: preference-evaluation-${{ github.sha }}
-          path: web/preference-evaluation.json
+          path: |
+            web/preference-evaluation.json
+            web/shared-learning.json
           if-no-files-found: error

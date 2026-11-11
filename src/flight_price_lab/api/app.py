@@ -27,6 +27,7 @@ from flight_price_lab.api.booking import (
     SearchAPIBookingResolver,
 )
 from flight_price_lab.api.calendar import DirectionalCalendarService
+from flight_price_lab.api.feedback import feedback_router
 from flight_price_lab.api.models import (
     CalendarResponse,
     ErrorResponse,
@@ -77,6 +78,7 @@ def create_app(
         allow_headers=["*"],
     )
     database_engine = create_database_engine()
+    application.include_router(feedback_router(database_engine))
     candidate_store = BookingCandidateStore(engine=database_engine)
     search_store = SearchSessionStore(engine=database_engine)
     price_history_store = PriceHistoryStore(database_engine)

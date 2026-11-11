@@ -32,6 +32,9 @@ module-root = "src"
 [tool.vercel]
 entrypoint = "backend.main:app"
 
+[tool.vercel.scripts]
+build = "python scripts/deploy_migrate.py"
+
 [tool.pytest.ini_options]
 testpaths = ["tests"]
 pythonpath = ["."]

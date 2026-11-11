@@ -28,11 +28,13 @@ export function PreferenceTrainer({
   profile,
   onChoose,
   onReset,
+  sharing,
 }: {
   options: TripOption[];
   profile: PreferenceProfile;
   onChoose: (chosen: TripOption, rejected: TripOption) => void;
   onReset: () => void;
+  sharing?: { enabled: boolean; status: string; toggle: (enabled: boolean) => void };
 }) {
   const pair = choosePreferencePair(options, profile);
   const priorities = leadingPreferences(profile);
@@ -48,9 +50,13 @@ export function PreferenceTrainer({
         : "Teach Flightly your trade-offs. Each answer updates a pairwise ranking model."}</span>
       <small>
         <a href={release.registryUrl} target="_blank" rel="noreferrer">Ranking model v{release.version}</a>
-        {" · "}{profile.comparisons ? "Personal learning stored in this browser." : "Starting from a synthetic convenience-first profile."}
+        {" · "}{profile.comparisons ? "Personal learning stored in this browser." : release.dataset === "human" ? "Starting from a shared model trained on opted-in choices." : "Starting from a synthetic convenience-first profile."}
         {" "}Choose For you to rank results. Connection-safety rules remain hard constraints.
       </small>
+      {sharing && <div className="preference-sharing">
+        <label><input type="checkbox" checked={sharing.enabled} onChange={(event) => sharing.toggle(event.target.checked)} /> Help improve recommendations for everyone</label>
+        <small role="status">{sharing.status}</small>
+      </div>}
     </div>
     {pair && <div className="preference-choices">
       <Choice option={pair.left} onChoose={() => onChoose(pair.left, pair.right)} />

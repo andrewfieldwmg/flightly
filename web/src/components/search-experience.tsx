@@ -14,6 +14,7 @@ import { TripSummary } from "./trip-summary";
 import { calendarPrefetchKey, prefetchSearchCalendar } from "@/lib/search/calendar-prefetch";
 import { PreferenceTrainer } from "./preference-trainer";
 import { usePreferenceModel } from "@/hooks/use-preference-model";
+import { useSharedFeedback } from "@/hooks/use-shared-feedback";
 
 const emptyDirectionResults = {
   baseline: null,
@@ -36,6 +37,7 @@ export function SearchExperience() {
   const [cachedMinutes, setCachedMinutes] = useState<number | null>(null);
   const [excludeBaggage, setExcludeBaggage] = useState(true);
   const { profile: preferenceProfile, choose: recordPreference, reset: resetPreferences } = usePreferenceModel();
+  const sharedFeedback = useSharedFeedback(state.snapshot?.search_id);
   const savedTrips = useRef(new Set<string>());
   const searchClickedAt = useRef<number | null>(null);
   const firstRenderedResultRecorded = useRef(false);
@@ -210,8 +212,9 @@ export function SearchExperience() {
           {state.snapshot && preferenceOptions.length > 0 && <PreferenceTrainer
             options={preferenceOptions}
             profile={preferenceProfile}
-            onChoose={recordPreference}
+            onChoose={(chosen, rejected) => { recordPreference(chosen, rejected); sharedFeedback.share(chosen, rejected); }}
             onReset={resetPreferences}
+            sharing={sharedFeedback}
           />}
           {state.snapshot && <TripSummary
             outbound={outbound}
