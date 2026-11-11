@@ -28,7 +28,7 @@
   "trainingBudget": 36,
   "benchmarkVersion": 1,
   "validationPassed": true,
-  "sourceCommit": "e9596d27e525fa5cd6e0073f73ee72eb2ea170f3",
+  "sourceCommit": "a062d57d532e22d1e99232f2965f48b1e262f25f",
   "predictionExamples": [
     {
       "features": {
@@ -90,8 +90,8 @@
       "passed": true
     }
   ],
-  "version": "2",
-  "modelId": "m-88e08c1dd068495c859bfb3feb800755",
-  "runId": "73d123d5a914447a806ff5578ebc2f8c",
-  "registryUrl": "https://desktop-u6i86iq.tail53b14b.ts.net/#/models/FlightlyPreferenceRanker/versions/2"
+  "version": "4",
+  "modelId": "m-7a370749d1d34c758d10622502c58051",
+  "runId": "0379c477be6443b2b9c79629336c4bb9",
+  "registryUrl": "https://desktop-u6i86iq.tail53b14b.ts.net/#/models/FlightlyPreferenceRanker/versions/4"
 }
