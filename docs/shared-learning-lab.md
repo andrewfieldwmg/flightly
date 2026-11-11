@@ -88,8 +88,10 @@ uv run --script scripts/shared_learning.py sync --config work/flightly-feedback-
 
 The simulator's seed is fixed. JSON reports, source hashes, model artifacts and
 dataset lineage are logged. CI also exports the shared simulation report.
-Native evaluation runs have per-example scores and traces; they are distinct
-from the training runs that log aggregate metrics and model packages.
+Native evaluation views show per-example scores and traces. In this lab the same
+baseline/candidate run also holds aggregate metrics and a model package; it can
+appear in both training and evaluation views. The learning-rate trials are
+separate child runs. An experiment groups these related runs and datasets.
 
 ## Background services
 
